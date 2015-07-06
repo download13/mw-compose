@@ -7,6 +7,8 @@ var concat = Array.prototype.concat;
 function composeMiddleware() {
 	var list = concat.apply([], arguments);
 
+	list.forEach(functionsOnly);
+
 	return function(req, res, next) {
 		var wares = list.slice(0);
 
@@ -19,6 +21,12 @@ function composeMiddleware() {
 				next();
 			}
 		}
+	}
+}
+
+function functionsOnly(item) {
+	if(typeof item !== 'function') {
+		throw new Error('mw-compose argument was not a function: ' + item);
 	}
 }
 

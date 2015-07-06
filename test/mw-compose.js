@@ -48,6 +48,24 @@ describe('mw', function() {
 		assert(res.handler3);
 		assert(!res.handler4);
 	});
+
+	it('should call next if no handlers handled the request', function(done) {
+		var res = runHandler(mw(handler1));
+
+		setTimeout(function() {
+			assert(res.nextCalled);
+
+			done();
+		}, 20);
+	});
+
+	it('should throw an error on being givena a non-function handler', function() {
+		assert.throws(function() {
+			mw('not a function');
+		}, function(err) {
+			return err.message === 'mw-compose argument was not a function: not a function';
+		});
+	});
 });
 
 
@@ -76,7 +94,9 @@ function runHandler(handler) {
 
 	var res = {};
 
-	handler(req, res);
+	handler(req, res, function() {
+		res.nextCalled = true;
+	});
 
 	return res;
 }
